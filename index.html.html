@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ContaFlash | Control financiero</title>
+<style>
+:root{--navy:#132238;--blue:#356ae6;--teal:#13a89e;--bg:#f3f6fb;--card:#fff;--muted:#667085;--line:#e4e9f2;--red:#d94b58;--green:#12805c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(125deg,#132238,#234b83);color:white;padding:24px 18px 30px}
+.wrap{max-width:1100px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:24px;font-weight:800;letter-spacing:-.5px}.brand span{color:#60e0cf}.sub{color:#d8e3f6;margin-top:7px;font-size:14px}
+main{max-width:1100px;margin:-16px auto 36px;padding:0 16px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 5px 18px #10213a08}.kicker{font-size:12px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.6px}.amount{font-size:26px;font-weight:800;margin-top:8px}.green{color:var(--green)}.red{color:var(--red)}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:14px;margin-top:14px}.section-title{font-size:17px;font-weight:800;margin:0 0 14px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field label{font-size:13px;font-weight:650;color:#344054}.field input,.field select{border:1px solid #d5dce8;border-radius:10px;padding:11px 12px;font:inherit;background:white;min-width:0;width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--blue);color:white;width:100%;margin-top:6px}.secondary{background:#edf2ff;color:#264fb0}.danger{background:#fff0f1;color:#b42332}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar button{font-size:12px;padding:9px 11px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}td:last-child,th:last-child{text-align:right}.pill{border-radius:20px;padding:4px 8px;font-size:11px;font-weight:800}.pill.in{background:#e5f8f0;color:#08744f}.pill.out{background:#fff0f1;color:#b42332}.empty{padding:28px;text-align:center;color:var(--muted);font-size:14px}
+.chart{height:190px;display:flex;align-items:end;gap:14px;padding:14px 4px 0;border-bottom:1px solid var(--line)}.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:end}.bars{display:flex;align-items:end;gap:5px;height:145px;width:100%;justify-content:center}.bar{width:min(32px,38%);min-height:2px;border-radius:6px 6px 0 0}.bar.in{background:var(--teal)}.bar.out{background:#f0a2ab}.month{font-size:11px;color:var(--muted)}.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+footer{max-width:1100px;margin:0 auto 24px;padding:0 16px;color:var(--muted);font-size:12px;line-height:1.5}
+.notice{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}.alert{background:#fff8e7;border:1px solid #f6df9c;border-radius:12px;padding:12px;color:#805b08;font-size:12px;margin-top:14px}
+@media(max-width:760px){.cards{grid-template-columns:1fr}.layout{grid-template-columns:1fr}.amount{font-size:24px}.top{align-items:flex-start}.brand{font-size:22px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="top"><div><div class="brand">Conta<span>Flash</span></div><div class="sub">Control financiero simple para pequeños negocios</div></div><button class="secondary" id="demoBtn">Cargar ejemplo</button></div></div></header>
+<main>
+  <section class="cards">
+    <div class="card"><div class="kicker">Ingresos registrados</div><div class="amount green" id="totalIncome">Bs 0,00</div></div>
+    <div class="card"><div class="kicker">Gastos registrados</div><div class="amount red" id="totalExpense">Bs 0,00</div></div>
+    <div class="card"><div class="kicker">Saldo del periodo</div><div class="amount" id="balance">Bs 0,00</div></div>
+  </section>
+  <section class="layout">
+    <div class="card">
+      <h2 class="section-title">Registrar movimiento</h2>
+      <form id="entryForm">
+        <div class="field"><label for="type">Tipo de movimiento</label><select id="type"><option value="income">Ingreso</option><option value="expense">Gasto</option></select></div>
+        <div class="field"><label for="description">Descripción</label><input id="description" placeholder="Ej. Venta de productos" maxlength="80" required></div>
+        <div class="row">
+          <div class="field"><label for="amount">Importe (Bs)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required></div>
+          <div class="field"><label for="date">Fecha</label><input id="date" type="date" required></div>
+        </div>
+        <div class="field"><label for="category">Categoría</label><select id="category"><option>Ventas</option><option>Servicios</option><option>Alquiler</option><option>Transporte</option><option>Materiales</option><option>Servicios básicos</option><option>Otros</option></select></div>
+        <button class="primary" type="submit">+ Guardar movimiento</button>
+      </form>
+      <div class="notice">Esta versión guarda los datos en este navegador. No es una plataforma en la nube ni reemplaza un sistema contable formal.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <h2 class="section-title">Resumen visual</h2>
+        <div class="chart" id="chart"></div>
+        <div class="legend"><span><i class="dot" style="background:var(--teal)"></i>Ingresos</span><span><i class="dot" style="background:#f0a2ab"></i>Gastos</span></div>
+      </div>
+      <div class="card">
+        <div class="top" style="margin-bottom:12px"><h2 class="section-title" style="margin:0">Historial</h2><div class="toolbar" style="margin:0"><button class="secondary" id="csvBtn">Exportar CSV</button><button class="danger" id="clearBtn">Borrar</button></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Movimiento</th><th>Categoría</th><th>Importe</th><th></th></tr></thead><tbody id="entries"></tbody></table><div class="empty" id="empty">Todavía no hay movimientos. Registra uno o carga el ejemplo.</div></div>
+      </div>
+    </div>
+  </section>
+  <div class="alert"><strong>Para tu exposición:</strong> usa datos ficticios o autorizados. ContaFlash organiza información básica para control interno; no calcula impuestos oficiales ni sustituye la revisión de un profesional contable.</div>
+</main>
+<footer>ContaFlash · Prototipo académico para Contaduría General · INCOS Cochabamba. Importes expresados en bolivianos (Bs).</footer>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>'Bs '+Number(n).toLocaleString('es-BO',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=new Date(); $('date').value=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+let entries=[];
+try{entries=JSON.parse(localStorage.getItem('contaflash_entries')||'[]')}catch(e){entries=[]}
+function persist(){try{localStorage.setItem('contaflash_entries',JSON.stringify(entries))}catch(e){}}
+function render(){
+ const income=entries.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0);
+ const expense=entries.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+ $('totalIncome').textContent=money(income);$('totalExpense').textContent=money(expense);$('balance').textContent=money(income-expense);
+ $('balance').className='amount '+(income-expense>=0?'green':'red');
+ const body=$('entries');body.innerHTML='';
+ $('empty').style.display=entries.length?'none':'block';
+ [...entries].sort((a,b)=>b.date.localeCompare(a.date)).forEach(x=>{
+  const tr=document.createElement('tr');
+  const vals=[x.date,x.description,x.category];
+  vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
+  const amount=document.createElement('td');amount.textContent=(x.type==='income'?'+':'−')+money(x.amount);amount.className=x.type==='income'?'green':'red';tr.appendChild(amount);
+  const action=document.createElement('td');const btn=document.createElement('button');btn.className='danger';btn.textContent='×';btn.title='Eliminar movimiento';btn.onclick=()=>{entries=entries.filter(y=>y.id!==x.id);persist();render()};action.appendChild(btn);tr.appendChild(action);body.appendChild(tr);
+ });
+ renderChart();
+}
+function renderChart(){
+ const chart=$('chart');chart.innerHTML='';
+ const months=[];
+ for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);months.push({key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),label:d.toLocaleDateString('es-BO',{month:'short'})})}
+ const vals=months.map(m=>({ ...m,inc:entries.filter(x=>x.date.startsWith(m.key)&&x.type==='income').reduce((s,x)=>s+x.amount,0),out:entries.filter(x=>x.date.startsWith(m.key)&&x.type==='expense').reduce((s,x)=>s+x.amount,0)}));
+ const max=Math.max(1,...vals.flatMap(v=>[v.inc,v.out]));
+ vals.forEach(v=>{const group=document.createElement('div');group.className='bar-group';const bars=document.createElement('div');bars.className='bars';
+  [['inc',v.inc,'in'],['out',v.out,'out']].forEach(([k,n,cl])=>{const b=document.createElement('div');b.className='bar '+cl;b.style.height=(n/max*135)+'px';b.title=(k==='inc'?'Ingresos: ':'Gastos: ')+money(n);bars.appendChild(b)});
+  const label=document.createElement('div');label.className='month';label.textContent=v.label;group.appendChild(bars);group.appendChild(label);chart.appendChild(group)});
+}
+$('entryForm').addEventListener('submit',e=>{e.preventDefault();const description=$('description').value.trim();const amount=Number($('amount').value);if(!description||!Number.isFinite(amount)||amount<=0)return;
+ entries.push({id:Date.now()+Math.random(),type:$('type').value,description,amount,date:$('date').value,category:$('category').value});persist();render();$('description').value='';$('amount').value='';$('description').focus()});
+$('demoBtn').onclick=()=>{if(entries.length&&!confirm('¿Agregar movimientos de ejemplo a los que ya tienes?'))return;entries.push(
+{id:Date.now()+1,type:'income',description:'Ventas del día',amount:250,date:todayISO(),category:'Ventas'},
+{id:Date.now()+2,type:'income',description:'Servicio realizado',amount:120,date:todayISO(),category:'Servicios'},
+{id:Date.now()+3,type:'expense',description:'Compra de materiales',amount:85,date:todayISO(),category:'Materiales'},
+{id:Date.now()+4,type:'expense',description:'Transporte',amount:20,date:todayISO(),category:'Transporte'}
+);persist();render()};
+function todayISO(){return [today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-')}
+$('clearBtn').onclick=()=>{if(confirm('¿Borrar todos los movimientos guardados en este navegador?')){entries=[];persist();render()}};
+$('csvBtn').onclick=()=>{const rows=[['Fecha','Tipo','Descripción','Categoría','Importe (Bs)'],...entries.map(x=>[x.date,x.type==='income'?'Ingreso':'Gasto',x.description,x.category,x.amount])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='contaflash_movimientos.csv';a.click();URL.revokeObjectURL(a.href)};
+render();
+</script>
+</body>
+</html>
